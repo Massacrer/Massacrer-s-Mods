@@ -4,7 +4,7 @@ version: 1.0
 author: Massacrer
 commands:
   mm:
-    aliases: [ m, mmod , massacrer ]
+    aliases: [ m, mmod ]
     description: Massacrer's private / custom mod
     usage: |
       /<command> skin | a - sets the player's armour piece (specified by the next argument) to the item number specified
