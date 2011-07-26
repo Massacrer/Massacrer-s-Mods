@@ -1,0 +1,13 @@
+name: MassacrersMods
+main: me.massacrer.mymods.mymods
+version: 1.0
+author: Massacrer
+commands:
+  mm:
+    aliases: [ m, mmod , massacrer ]
+    description: Massacrer's private / custom mod
+    usage: |
+      /<command> skin | a - sets the player's armour piece (specified by the next argument) to the item number specified
+permissions:
+  massacrer.*
+    default: op
