@@ -1,5 +1,5 @@
 name: MassacrersMods
-main: me.massacrer.mymods.mymods
+main: me.massacrer.mymods.MassacrersMod
 version: 1.0
 author: Massacrer
 commands:
@@ -9,5 +9,5 @@ commands:
     usage: |
       /<command> skin | a - sets the player's armour piece (specified by the next argument) to the item number specified
 permissions:
-  massacrer.*
+  massacrer.*:
     default: op
