@@ -8,6 +8,3 @@ commands:
     description: Massacrer's private / custom mod
     usage: |
       /<command> skin | a - sets the player's armour piece (specified by the next argument) to the item number specified
-permissions:
-  massacrer.*:
-    default: op
