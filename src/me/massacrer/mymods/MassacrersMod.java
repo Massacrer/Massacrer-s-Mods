@@ -7,6 +7,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
@@ -16,9 +18,10 @@ import java.util.List;
 import java.util.logging.Logger;
 
 public class MassacrersMod extends JavaPlugin {
-	Logger log = Logger.getLogger("Minecraft");
+	static Logger log = Logger.getLogger("Minecraft");
 	MMCommandExecutor commandExecutor = new MMCommandExecutor(this);
-	PluginManager pm;
+	MMServerListener serverListener = new MMServerListener(this);
+	static PluginManager pm;
 	
 	public void onDisable() {
 		log.info("Massacrer's Mod disabled");
@@ -28,6 +31,8 @@ public class MassacrersMod extends JavaPlugin {
 		pm = getServer().getPluginManager();
 		getCommand("mm").setExecutor(commandExecutor);
 		log.info("Massacrer's Mod enabled");
+		pm.registerEvent(Type.SERVER_LIST_PING, serverListener,
+				Priority.Normal, this);
 	}
 	
 	void fitCustomHat(Player player, String str_block) {
@@ -123,6 +128,11 @@ public class MassacrersMod extends JavaPlugin {
 				count++;
 			}
 		}
-		player.sendMessage(ChatColor.DARK_AQUA + "" + count + " TNT entities removed");
+		player.sendMessage(ChatColor.DARK_AQUA + "" + count
+				+ " TNT entities removed");
+	}
+	
+	void lockServer(boolean locked) {
+		//TODO: implement this
 	}
 }

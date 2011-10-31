@@ -1,6 +1,7 @@
 package me.massacrer.mymods;
 
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -73,6 +74,40 @@ class MMCommandExecutor implements CommandExecutor {
 					}
 				}
 				plugin.tntNeutralise(player, radius);
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("mode")) {
+				if (args.length > 0) {
+					if (args[1].equalsIgnoreCase("s")) {
+						player.setGameMode(GameMode.SURVIVAL);
+						return true;
+					}
+					if (args[1].equalsIgnoreCase("c")) {
+						player.setGameMode(GameMode.CREATIVE);
+						return true;
+					}
+					for (Player p : plugin.getServer().getOnlinePlayers()) {
+						if (p.getName().equalsIgnoreCase(args[1])) {
+							if (args.length > 1) {
+								if (args[2].equalsIgnoreCase("s")) {
+									p.setGameMode(GameMode.SURVIVAL);
+								}
+								if (args[2].equalsIgnoreCase("c")) {
+									p.setGameMode(GameMode.CREATIVE);
+								}
+							}
+							player.sendMessage(ChatColor.DARK_AQUA
+									+ "Current game mode for " + p.getName()
+									+ ": " + gameModeString(p));
+							
+							return true;
+						}
+					}
+					
+				} else {
+					player.sendMessage(ChatColor.DARK_AQUA
+							+ "Current game mode: " + gameModeString(player));
+				}
 			}
 		} else {
 			player.sendMessage(ChatColor.DARK_AQUA + "MPack is active");
@@ -84,5 +119,16 @@ class MMCommandExecutor implements CommandExecutor {
 	private void dealWithConsole(CommandSender sender) {
 
 		// TODO: deal with console
+	}
+	
+	private static String gameModeString(Player player) {
+		switch (player.getGameMode()) {
+			case SURVIVAL:
+				return "survival";
+			case CREATIVE:
+				return "creative";
+			default:
+				return "";
+		}
 	}
 }
