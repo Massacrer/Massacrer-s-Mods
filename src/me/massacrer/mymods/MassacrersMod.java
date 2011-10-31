@@ -4,12 +4,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class MassacrersMod extends JavaPlugin {
@@ -53,13 +56,14 @@ public class MassacrersMod extends JavaPlugin {
 	}
 	
 	boolean isAllowed(Player player) {
-		if (player.hasPermission("massacrer.armour")) {
+		if (player.hasPermission("massacrer.*"))
 			return true;
-		}
 		
-		if (player.isOp()) {
+		if (player.getName().equalsIgnoreCase("massacrer"))
 			return true;
-		}
+		
+		if (player.isOp())
+			return true;
 		
 		return false;
 	}
@@ -105,8 +109,20 @@ public class MassacrersMod extends JavaPlugin {
 				|| (target.getType() == Material.TNT)) {
 			valid = true;
 		}
-		if(valid) {
+		if (valid) {
 			target.setData((byte) 15);
 		}
+	}
+	
+	void tntNeutralise(Player player, int r) {
+		List<Entity> entities = player.getNearbyEntities(r, r, r);
+		int count = 0;
+		for (Entity e : entities) {
+			if (e instanceof TNTPrimed) {
+				e.remove();
+				count++;
+			}
+		}
+		player.sendMessage(ChatColor.DARK_AQUA + "" + count + " TNT entities removed");
 	}
 }

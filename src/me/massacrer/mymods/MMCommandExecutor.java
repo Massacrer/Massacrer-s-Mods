@@ -18,47 +18,64 @@ class MMCommandExecutor implements CommandExecutor {
 			String label, String[] args) {
 		if (!(sender instanceof Player)) {
 			dealWithConsole(sender);
-		} else {
-			Player player = (Player) sender;
-			
-			if (args.length > 0) {
-				if (args[0].equalsIgnoreCase("hat")
-						|| args[0].equalsIgnoreCase("a")) {
-					if (args.length > 3) {
-						Player p = plugin.getServer().getPlayer(args[1]);
-						if (p != null) {
-							plugin.fitCustomHat(p, args[1]);
-						} else {
-							player.sendMessage(ChatColor.RED
-									+ "Invalid player name or syntax. Syntax is <command> hat <player> <block>");
-						}
+			return true;
+		}
+		
+		Player player = (Player) sender;
+		
+		if (!(plugin.isAllowed(player))) {
+			player.sendMessage(ChatColor.RED + "");
+			return true;
+		}
+		
+		if (args.length > 0) {
+			if (args[0].equalsIgnoreCase("hat")
+					|| args[0].equalsIgnoreCase("a")) {
+				if (args.length > 3) {
+					Player p = plugin.getServer().getPlayer(args[1]);
+					if (p != null) {
+						plugin.fitCustomHat(p, args[1]);
+					} else {
+						player.sendMessage(ChatColor.RED
+								+ "Invalid player name or syntax. Syntax is <command> hat <player> <block>");
+					}
+					return true;
+				}
+				plugin.fitCustomHat(player, args[1]);
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("r")) {
+				Boolean snipe;
+				Player activePlayer;
+				
+				if (args.length > 1) {
+					snipe = false;
+					activePlayer = plugin.getServer().getPlayer(args[1]);
+					if (activePlayer == null) {
+						sender.sendMessage(ChatColor.RED + "Player not found");
 						return true;
 					}
-					plugin.fitCustomHat(player, args[1]);
-					return true;
+				} else {
+					snipe = true;
+					activePlayer = player;
 				}
-				if (args[0].equalsIgnoreCase("r")) {
-					Boolean snipe;
-					Player activePlayer;
-					
-					if (args.length > 1) {
-						snipe = false;
-						activePlayer = plugin.getServer().getPlayer(args[1]);
-						if (activePlayer == null) {
-							sender.sendMessage(ChatColor.RED
-									+ "Player not found");
-							return true;
-						}
-					} else {
-						snipe = true;
-						activePlayer = player;
-					}
-					plugin.redstoneSnipe(activePlayer, snipe);
-					return true;
-				}
-			} else {
-				player.sendMessage(ChatColor.DARK_AQUA + "MPack is active");
+				plugin.redstoneSnipe(activePlayer, snipe);
+				return true;
 			}
+			if (args[0].equalsIgnoreCase("t")) {
+				int radius = 6;
+				if (args.length > 1) {
+					try {
+						radius = Integer.parseInt(args[1]);
+					} catch (NumberFormatException e) {
+						player.sendMessage(ChatColor.RED
+								+ "Invalid radius specified, using default (6)");
+					}
+				}
+				plugin.tntNeutralise(player, radius);
+			}
+		} else {
+			player.sendMessage(ChatColor.DARK_AQUA + "MPack is active");
 		}
 		
 		return false;
