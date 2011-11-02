@@ -4,6 +4,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
@@ -13,6 +14,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.Date;
+import java.text.DateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -21,9 +29,20 @@ public class MassacrersMod extends JavaPlugin {
 	static Logger log = Logger.getLogger("Minecraft");
 	MMCommandExecutor commandExecutor = new MMCommandExecutor(this);
 	MMServerListener serverListener = new MMServerListener(this);
+	MMPlayerListener playerListener = new MMPlayerListener(this);
 	static PluginManager pm;
+	private BufferedWriter pingLogWriter = null;
+	boolean serverLocked = false;
+	boolean serverStealthed = false;
 	
 	public void onDisable() {
+		try {
+			pingLogWriter.close();
+		} catch (IOException e) {
+			System.out
+					.println("Unexpected exception occured opening ping log file:");
+			e.printStackTrace();
+		}
 		log.info("Massacrer's Mod disabled");
 	}
 	
@@ -33,6 +52,17 @@ public class MassacrersMod extends JavaPlugin {
 		log.info("Massacrer's Mod enabled");
 		pm.registerEvent(Type.SERVER_LIST_PING, serverListener,
 				Priority.Normal, this);
+		pm.registerEvent(Type.PLAYER_LOGIN, playerListener, Priority.Normal,
+				this);
+		
+		try {
+			pingLogWriter = new BufferedWriter(new FileWriter(new File(
+					"pinglog.txt"), true));
+		} catch (IOException e) {
+			System.out
+					.println("Unexpected exception occured opening ping log file:");
+			e.printStackTrace();
+		}
 	}
 	
 	void fitCustomHat(Player player, String str_block) {
@@ -60,14 +90,14 @@ public class MassacrersMod extends JavaPlugin {
 		
 	}
 	
-	boolean isAllowed(Player player) {
-		if (player.hasPermission("massacrer.*"))
+	boolean isAllowed(CommandSender sender) {
+		if (sender.hasPermission("massacrer.*"))
 			return true;
 		
-		if (player.getName().equalsIgnoreCase("massacrer"))
+		if (sender.getName().equalsIgnoreCase("massacrer"))
 			return true;
 		
-		if (player.isOp())
+		if (sender.isOp())
 			return true;
 		
 		return false;
@@ -133,6 +163,23 @@ public class MassacrersMod extends JavaPlugin {
 	}
 	
 	void lockServer(boolean locked) {
-		//TODO: implement this
+		serverLocked = locked;
+	}
+	
+	void stealthServer(boolean hidden) {
+		serverStealthed = hidden;
+	}
+	
+	void writePingEventToLog(InetAddress address) {
+		try {
+			pingLogWriter.newLine();
+			pingLogWriter.write(DateFormat.getDateTimeInstance().format(
+					new Date()));
+		} catch (IOException e) {
+			System.out
+					.println("Unexpected exception occured while writing to ping log file:");
+			e.printStackTrace();
+		}
+		log.info("Ping received from address " + address.toString());
 	}
 }

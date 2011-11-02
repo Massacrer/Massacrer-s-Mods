@@ -5,6 +5,7 @@ import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 class MMCommandExecutor implements CommandExecutor {
@@ -17,15 +18,13 @@ class MMCommandExecutor implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
-		if (!(sender instanceof Player)) {
-			dealWithConsole(sender);
-			return true;
+		boolean player = sender instanceof Player;
+		if (sender instanceof ConsoleCommandSender) {
+			player = false;
 		}
 		
-		Player player = (Player) sender;
-		
-		if (!(plugin.isAllowed(player))) {
-			player.sendMessage(ChatColor.RED + "");
+		if (!(plugin.isAllowed(sender))) {
+			sender.sendMessage(ChatColor.RED + "Not allowed");
 			return true;
 		}
 		
@@ -37,12 +36,16 @@ class MMCommandExecutor implements CommandExecutor {
 					if (p != null) {
 						plugin.fitCustomHat(p, args[1]);
 					} else {
-						player.sendMessage(ChatColor.RED
+						sender.sendMessage(ChatColor.RED
 								+ "Invalid player name or syntax. Syntax is <command> hat <player> <block>");
 					}
 					return true;
 				}
-				plugin.fitCustomHat(player, args[1]);
+				if (!player) {
+					sender.sendMessage(ChatColor.RED + "Invalid command usage, please specify a player");
+					return true;
+				}
+				plugin.fitCustomHat((Player) sender, args[1]);
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("r")) {
@@ -57,33 +60,36 @@ class MMCommandExecutor implements CommandExecutor {
 						return true;
 					}
 				} else {
+					if (!player) {
+						sender.sendMessage(ChatColor.RED + "Invalid command usage, please specify a player");
+					}
 					snipe = true;
-					activePlayer = player;
+					activePlayer = (Player) sender;
 				}
 				plugin.redstoneSnipe(activePlayer, snipe);
 				return true;
 			}
-			if (args[0].equalsIgnoreCase("t")) {
-				int radius = 6;
+			if (args[0].equalsIgnoreCase("t") && player) {
+				int radius = 8;
 				if (args.length > 1) {
 					try {
 						radius = Integer.parseInt(args[1]);
 					} catch (NumberFormatException e) {
-						player.sendMessage(ChatColor.RED
+						sender.sendMessage(ChatColor.RED
 								+ "Invalid radius specified, using default (6)");
 					}
 				}
-				plugin.tntNeutralise(player, radius);
+				plugin.tntNeutralise((Player) sender, radius);
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("mode")) {
 				if (args.length > 0) {
-					if (args[1].equalsIgnoreCase("s")) {
-						player.setGameMode(GameMode.SURVIVAL);
+					if (args[1].equalsIgnoreCase("s") && player) {
+						((Player) sender).setGameMode(GameMode.SURVIVAL);
 						return true;
 					}
-					if (args[1].equalsIgnoreCase("c")) {
-						player.setGameMode(GameMode.CREATIVE);
+					if (args[1].equalsIgnoreCase("c") && player) {
+						((Player) sender).setGameMode(GameMode.CREATIVE);
 						return true;
 					}
 					for (Player p : plugin.getServer().getOnlinePlayers()) {
@@ -96,29 +102,42 @@ class MMCommandExecutor implements CommandExecutor {
 									p.setGameMode(GameMode.CREATIVE);
 								}
 							}
-							player.sendMessage(ChatColor.DARK_AQUA
+							sender.sendMessage(ChatColor.DARK_AQUA
 									+ "Current game mode for " + p.getName()
 									+ ": " + gameModeString(p));
 							
 							return true;
 						}
 					}
-					
-				} else {
-					player.sendMessage(ChatColor.DARK_AQUA
-							+ "Current game mode: " + gameModeString(player));
+				} else if (player) {
+					sender.sendMessage(ChatColor.DARK_AQUA
+							+ "Current game mode: "
+							+ gameModeString((Player) sender));
 				}
 			}
+			if (args[0].equalsIgnoreCase("stealth")) {
+				if (args.length > 0) {
+					if (args[1].equalsIgnoreCase("on")) {
+						plugin.stealthServer(true);
+						sender.sendMessage("Server now hidden");
+						return true;
+					}
+					if (args[1].equalsIgnoreCase("off")) {
+						plugin.stealthServer(false);
+						sender.sendMessage("Server now visible");
+						return true;
+					}
+				}
+				sender.sendMessage(ChatColor.DARK_AQUA + "Server is currently "
+						+ (plugin.serverStealthed ? "hidden" : "visible"));
+				return true;
+			}
 		} else {
-			player.sendMessage(ChatColor.DARK_AQUA + "MPack is active");
+			sender.sendMessage(ChatColor.DARK_AQUA + "MPack is active");
+			return true;
 		}
 		
 		return false;
-	}
-	
-	private void dealWithConsole(CommandSender sender) {
-
-		// TODO: deal with console
 	}
 	
 	private static String gameModeString(Player player) {
