@@ -83,7 +83,7 @@ class MMCommandExecutor implements CommandExecutor {
 				return true;
 			}
 			if (args[0].equalsIgnoreCase("mode")) {
-				if (args.length > 0) {
+				if (args.length > 1) {
 					if (args[1].equalsIgnoreCase("s") && player) {
 						((Player) sender).setGameMode(GameMode.SURVIVAL);
 						return true;
@@ -94,7 +94,7 @@ class MMCommandExecutor implements CommandExecutor {
 					}
 					for (Player p : plugin.getServer().getOnlinePlayers()) {
 						if (p.getName().equalsIgnoreCase(args[1])) {
-							if (args.length > 1) {
+							if (args.length > 2) {
 								if (args[2].equalsIgnoreCase("s")) {
 									p.setGameMode(GameMode.SURVIVAL);
 								}
@@ -116,7 +116,7 @@ class MMCommandExecutor implements CommandExecutor {
 				}
 			}
 			if (args[0].equalsIgnoreCase("stealth")) {
-				if (args.length > 0) {
+				if (args.length > 1) {
 					if (args[1].equalsIgnoreCase("on")) {
 						plugin.stealthServer(true);
 						sender.sendMessage("Server now hidden");

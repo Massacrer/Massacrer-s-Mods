@@ -174,12 +174,16 @@ public class MassacrersMod extends JavaPlugin {
 		try {
 			pingLogWriter.newLine();
 			pingLogWriter.write(DateFormat.getDateTimeInstance().format(
-					new Date()));
+					new Date())
+					+ ": "
+					+ address.toString()
+					+ (serverStealthed ? " (server currently hidden)" : ""));
 		} catch (IOException e) {
 			System.out
 					.println("Unexpected exception occured while writing to ping log file:");
 			e.printStackTrace();
 		}
-		log.info("Ping received from address " + address.toString());
+		log.info("Ping received from address " + address.toString()
+				+ (serverStealthed ? " (server currently hidden)" : ""));
 	}
 }
