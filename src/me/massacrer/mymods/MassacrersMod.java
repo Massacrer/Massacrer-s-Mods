@@ -1,7 +1,6 @@
 package me.massacrer.mymods;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -9,8 +8,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.PluginManager;
@@ -29,8 +26,7 @@ import java.util.logging.Logger;
 public class MassacrersMod extends JavaPlugin {
 	static Logger log = Logger.getLogger("Minecraft");
 	MMCommandExecutor commandExecutor = new MMCommandExecutor(this);
-	MMServerListener serverListener = new MMServerListener(this);
-	MMPlayerListener playerListener = new MMPlayerListener(this);
+	MMListener listener = new MMListener(this);
 	MMPortalManager portalManager = new MMPortalManager(this);
 	static PluginManager pm;
 	private BufferedWriter pingLogWriter = null;
@@ -44,11 +40,8 @@ public class MassacrersMod extends JavaPlugin {
 	public void onEnable() {
 		pm = getServer().getPluginManager();
 		getCommand("mm").setExecutor(commandExecutor);
+		pm.registerEvents(listener,this);
 		log.info("Massacrer's Mod enabled");
-		pm.registerEvent(Type.SERVER_LIST_PING, serverListener,
-				Priority.Normal, this);
-		pm.registerEvent(Type.PLAYER_LOGIN, playerListener, Priority.Normal,
-				this);
 	}
 	
 	void fitCustomHat(Player player, String str_block) {

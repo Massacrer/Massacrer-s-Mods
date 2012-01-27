@@ -1,7 +1,6 @@
 package me.massacrer.mymods;
 
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -78,44 +77,11 @@ class MMCommandExecutor implements CommandExecutor {
 						radius = Integer.parseInt(args[1]);
 					} catch (NumberFormatException e) {
 						sender.sendMessage(ChatColor.RED
-								+ "Invalid radius specified, using default (6)");
+								+ "Invalid radius specified, using default (8)");
 					}
 				}
 				plugin.tntNeutralise((Player) sender, radius);
 				return true;
-			}
-			if (args[0].equalsIgnoreCase("mode")) {
-				if (args.length > 1) {
-					if (args[1].equalsIgnoreCase("s") && player) {
-						((Player) sender).setGameMode(GameMode.SURVIVAL);
-						return true;
-					}
-					if (args[1].equalsIgnoreCase("c") && player) {
-						((Player) sender).setGameMode(GameMode.CREATIVE);
-						return true;
-					}
-					for (Player p : plugin.getServer().getOnlinePlayers()) {
-						if (p.getName().equalsIgnoreCase(args[1])) {
-							if (args.length > 2) {
-								if (args[2].equalsIgnoreCase("s")) {
-									p.setGameMode(GameMode.SURVIVAL);
-								}
-								if (args[2].equalsIgnoreCase("c")) {
-									p.setGameMode(GameMode.CREATIVE);
-								}
-							}
-							sender.sendMessage(ChatColor.DARK_AQUA
-									+ "Current game mode for " + p.getName()
-									+ ": " + gameModeString(p));
-							
-							return true;
-						}
-					}
-				} else if (player) {
-					sender.sendMessage(ChatColor.DARK_AQUA
-							+ "Current game mode: "
-							+ gameModeString((Player) sender));
-				}
 			}
 			if (args[0].equalsIgnoreCase("stealth")) {
 				if (args.length > 1) {
@@ -130,22 +96,29 @@ class MMCommandExecutor implements CommandExecutor {
 						+ (plugin.serverStealthed ? "hidden" : "visible"));
 				return true;
 			}
+			if (args[0].equalsIgnoreCase("lock")) {
+				plugin.lockServer(true);
+				sender.sendMessage(ChatColor.DARK_AQUA + "Server is now locked");
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("unlock")) {
+				plugin.lockServer(false);
+				sender.sendMessage(ChatColor.DARK_AQUA
+						+ "Server is now unlocked");
+				return true;
+			}
+			if (args[0].equalsIgnoreCase("fly") && player) {
+				boolean canFly = true;
+				if (args.length > 1 && args[1].equalsIgnoreCase("0")) {
+					canFly = false;
+				}
+				((Player) sender).setAllowFlight(canFly);
+			}
 		} else {
 			sender.sendMessage(ChatColor.DARK_AQUA + "MPack is active");
 			return true;
 		}
 		
 		return false;
-	}
-	
-	private static String gameModeString(Player player) {
-		switch (player.getGameMode()) {
-			case SURVIVAL:
-				return "survival";
-			case CREATIVE:
-				return "creative";
-			default:
-				return "";
-		}
 	}
 }

@@ -1,6 +1,6 @@
 name: MassacrersMods
 main: me.massacrer.mymods.MassacrersMod
-version: 1.0
+version: 1.1
 author: Massacrer
 commands:
   mm:
