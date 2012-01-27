@@ -42,7 +42,8 @@ class MMCommandExecutor implements CommandExecutor {
 					return true;
 				}
 				if (!player) {
-					sender.sendMessage(ChatColor.RED + "Invalid command usage, please specify a player");
+					sender.sendMessage(ChatColor.RED
+							+ "Invalid command usage, please specify a player");
 					return true;
 				}
 				plugin.fitCustomHat((Player) sender, args[1]);
@@ -61,7 +62,8 @@ class MMCommandExecutor implements CommandExecutor {
 					}
 				} else {
 					if (!player) {
-						sender.sendMessage(ChatColor.RED + "Invalid command usage, please specify a player");
+						sender.sendMessage(ChatColor.RED
+								+ "Invalid command usage, please specify a player");
 					}
 					snipe = true;
 					activePlayer = (Player) sender;
@@ -119,13 +121,9 @@ class MMCommandExecutor implements CommandExecutor {
 				if (args.length > 1) {
 					if (args[1].equalsIgnoreCase("on")) {
 						plugin.stealthServer(true);
-						sender.sendMessage("Server now hidden");
-						return true;
 					}
 					if (args[1].equalsIgnoreCase("off")) {
 						plugin.stealthServer(false);
-						sender.sendMessage("Server now visible");
-						return true;
 					}
 				}
 				sender.sendMessage(ChatColor.DARK_AQUA + "Server is currently "

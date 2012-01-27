@@ -1,6 +1,7 @@
 package me.massacrer.mymods;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -30,19 +31,13 @@ public class MassacrersMod extends JavaPlugin {
 	MMCommandExecutor commandExecutor = new MMCommandExecutor(this);
 	MMServerListener serverListener = new MMServerListener(this);
 	MMPlayerListener playerListener = new MMPlayerListener(this);
+	MMPortalManager portalManager = new MMPortalManager(this);
 	static PluginManager pm;
 	private BufferedWriter pingLogWriter = null;
 	boolean serverLocked = false;
 	boolean serverStealthed = false;
 	
 	public void onDisable() {
-		try {
-			pingLogWriter.close();
-		} catch (IOException e) {
-			System.out
-					.println("Unexpected exception occured opening ping log file:");
-			e.printStackTrace();
-		}
 		log.info("Massacrer's Mod disabled");
 	}
 	
@@ -54,15 +49,6 @@ public class MassacrersMod extends JavaPlugin {
 				Priority.Normal, this);
 		pm.registerEvent(Type.PLAYER_LOGIN, playerListener, Priority.Normal,
 				this);
-		
-		try {
-			pingLogWriter = new BufferedWriter(new FileWriter(new File(
-					"pinglog.txt"), true));
-		} catch (IOException e) {
-			System.out
-					.println("Unexpected exception occured opening ping log file:");
-			e.printStackTrace();
-		}
 	}
 	
 	void fitCustomHat(Player player, String str_block) {
@@ -137,14 +123,10 @@ public class MassacrersMod extends JavaPlugin {
 			loc.setY(loc.getY() - 1);
 			target = loc.getBlock();
 		}
-		boolean valid = false;
 		if ((target.getType() == Material.REDSTONE)
 				|| (target.getType() == Material.REDSTONE_WIRE)
 				|| (target.getType() == Material.REDSTONE_TORCH_OFF)
 				|| (target.getType() == Material.TNT)) {
-			valid = true;
-		}
-		if (valid) {
 			target.setData((byte) 15);
 		}
 	}
@@ -172,15 +154,16 @@ public class MassacrersMod extends JavaPlugin {
 	
 	void writePingEventToLog(InetAddress address) {
 		try {
+			pingLogWriter = new BufferedWriter(new FileWriter(new File(
+					"pinglog.txt"), true));
+			String output = DateFormat.getDateTimeInstance().format(new Date())
+					+ " " + address.toString()
+					+ (serverStealthed ? " (hidden)" : "");
+			pingLogWriter.write(output);
 			pingLogWriter.newLine();
-			pingLogWriter.write(DateFormat.getDateTimeInstance().format(
-					new Date())
-					+ ": "
-					+ address.toString()
-					+ (serverStealthed ? " (server currently hidden)" : ""));
+			pingLogWriter.close();
 		} catch (IOException e) {
-			System.out
-					.println("Unexpected exception occured while writing to ping log file:");
+			System.out.println("Unexpected exception occured while writing to ping log file:");
 			e.printStackTrace();
 		}
 		log.info("Ping received from address " + address.toString()
